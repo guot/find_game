@@ -6,8 +6,13 @@
 <script src="jquery.js"></script>
 
 <script 	type="text/javascript">
-	var cw = $(window).width()
-	var ch= $(window).height()
+	var cw =800
+	var ch= 800
+	var maxPic = 18
+
+	var bg = new Image()
+	bg.src="bg.png"  
+
 	var Card = function  (id) {
 		this.img= new Image()
 		this.id=id
@@ -15,6 +20,9 @@
 		this.y=0
 		this.w=120
 		this.h=100
+		this.bg = bg
+		this.show=true;
+		this.isFront=false;
 		this.check=function (x0,y0){
 			x=this.x
 			y=this.y
@@ -27,24 +35,43 @@
 			}
 			 
 		}
+	} 
+	
+	var selectOne=null;
+	var selectTwo =null;
+
+	function clickCanvas ( e) {
+		var card
+		for (var i = 0; i < desk.length; i++) {
+			if(desk[i].check(e.x,e.y)){
+				card = desk[i]
+				break
+			}
+		};
+
+		if(selectOne==null){
+			selectOne=card;
+			card.isFront=true;
+		}else if(selectTwo==null&&selectOne!=card){
+			selectTwo=card;
+			card.isFront=true;
+			setTimeout(function(){
+				if(selectOne.id==selectTwo.id){ 
+
+					selectTwo.show=false;
+					selectOne.show=false;
+					
+				}else{
+					selectOne.isFront= false
+					selectTwo.isFront= false
+				}
+				selectOne=null;
+				selectTwo = null;
+
+			}, 1000)	
+		}  
 	}
 
-	
-	 
-	 
-
-
-	$(function  () {
-		var bg = new Image()
-		bg.onload=function  () {
-			
-			amin()
-
-		}
-		bg.src="bg.png"
-
-
-	}()); 
 
 	var desk= new  Array();  
 
@@ -52,12 +79,9 @@
 <body>
 
 <div id="container">
-	<canvas id="canvas_A" width="800" height="800">Your Browser does not support Canvas, please upgrade</canvas>
+	<canvas id="canvas_A" width="800" height="800"   onclick="clickCanvas(event)">Your Browser does not support Canvas, please upgrade</canvas>
 </div>
-<script>
-
- 
-	
+<script> 
 
 	c=document.getElementById("canvas_A");
 	ctx=c.getContext("2d");
@@ -68,7 +92,9 @@
  	 var desk = new Array()
 	   // var rand = Math.floor(Math.random()*10)
 	    // console.log(rand)
-	  for (var i = 0; i < 10; i++) {
+
+
+	  for (var i = 0; i < maxPic; i++) {
 
 	  	 var src ="img/"+i+".png"
 	  	 var card = new Card(i)
@@ -102,7 +128,7 @@
 	  	 desk[i].x=x++*130
 	  	desk[i].y =y*110
 
-	  	if(x%5==0){
+	  	if(x%6==0){
 			y++
 			x=0
 		}  
@@ -114,14 +140,16 @@
 		ctx.clearRect(0, 0, cw, ch);
 		var y=0
 		var x=0
-		for (var i = 0; i < 20; i++) {
-			 var car = desk[i];
+		for (var i = 0; i <  desk.length; i++) {
+			 var car = desk[i]; 
 
-
-			if(car!=null){
-				ctx.drawImage(car.img ,car.x,car.y,120,100)
-			} 
-			
+			if(car.show){
+				if(car.isFront){
+					ctx.drawImage(car.img ,car.x,car.y,120,100)
+				}else{
+					ctx.drawImage(car.bg ,car.x,car.y,120,100)
+				}
+			}  
 		} 
      		
      		//console.log("hello")
